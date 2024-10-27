@@ -2,6 +2,7 @@ package display
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/sagoresarker/linux-process-visualizer/internal/metrics"
 
@@ -29,12 +30,14 @@ type Event struct {
 
 // NewTUI initializes a new TUI
 func NewTUI() (*TUI, error) {
+	log.Println("Initializing TUI...")
 	tui := &TUI{
 		app:    tview.NewApplication(),
 		events: make(chan Event),
 	}
 
 	// Initialize widgets
+	log.Println("Setting up widgets...")
 	// For TextView widgets
 	tui.cpuBox = tview.NewTextView()
 	tui.cpuBox.SetDynamicColors(true)
@@ -64,6 +67,7 @@ func NewTUI() (*TUI, error) {
 	tui.app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyEsc, tcell.KeyCtrlC:
+			log.Println("Quit signal received")
 			tui.events <- Event{Type: EventQuit}
 		}
 		return event
@@ -71,10 +75,21 @@ func NewTUI() (*TUI, error) {
 
 	tui.app.SetRoot(grid, true)
 
+	// Start the application in a separate goroutine
+	go func() {
+		log.Println("Starting TUI application...")
+		if err := tui.app.Run(); err != nil {
+			log.Printf("Error running application: %v\n", err)
+			tui.events <- Event{Type: EventQuit}
+		}
+	}()
+
+	log.Println("TUI initialization complete")
 	return tui, nil
 }
 
 func (t *TUI) Close() {
+	log.Println("Closing TUI...")
 	t.app.Stop()
 }
 
@@ -84,6 +99,7 @@ func (t *TUI) Events() chan Event {
 
 func (t *TUI) Update(stats metrics.SystemStats) {
 	t.app.QueueUpdateDraw(func() {
+		log.Println("Updating TUI displays...")
 		// Update CPU display
 		t.updateCPU(stats.CPU)
 
