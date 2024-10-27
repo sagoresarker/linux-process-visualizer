@@ -38,7 +38,6 @@ func NewTUI() (*TUI, error) {
 
 	// Initialize widgets
 	log.Println("Setting up widgets...")
-	// For TextView widgets
 	tui.cpuBox = tview.NewTextView()
 	tui.cpuBox.SetDynamicColors(true)
 	tui.cpuBox.SetTitle("CPU Usage")
@@ -100,13 +99,10 @@ func (t *TUI) Events() chan Event {
 func (t *TUI) Update(stats metrics.SystemStats) {
 	t.app.QueueUpdateDraw(func() {
 		log.Println("Updating TUI displays...")
-		// Update CPU display
 		t.updateCPU(stats.CPU)
 
-		// Update memory display
 		t.updateMemory(stats.Memory)
 
-		// Update process list
 		t.updateProcesses(stats.Process)
 	})
 }
@@ -136,7 +132,6 @@ func (t *TUI) updateMemory(mem metrics.MemoryStats) {
 func (t *TUI) updateProcesses(processes []metrics.ProcessInfo) {
 	t.processBox.Clear()
 
-	// Set headers
 	headers := []string{"PID", "Name", "CPU%", "Memory", "Priority", "State"}
 	for i, header := range headers {
 		t.processBox.SetCell(0, i,
@@ -154,7 +149,6 @@ func (t *TUI) updateProcesses(processes []metrics.ProcessInfo) {
 		}
 	}
 
-	// Fill process data
 	for i, proc := range processes {
 		if i >= 100 { // Show only top 100 processes
 			break

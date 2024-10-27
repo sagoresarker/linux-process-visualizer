@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	// Set up logging to file
 	logFile, err := os.OpenFile("app.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("Error opening log file: %v", err)
@@ -32,7 +31,6 @@ func main() {
 	collector := metrics.NewCollector()
 	log.Println("Metrics collector initialized")
 
-	// Update loop
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 
